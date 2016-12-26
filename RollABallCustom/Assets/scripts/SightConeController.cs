@@ -5,58 +5,55 @@ using System.Linq;
 
 public class SightConeController : MonoBehaviour {
 
-    public GameObject player;
+    public GameObject player; // our player
     public int sightRange; // this is not the light range!
-    private Vector3 offset;
+    private Vector3 offset; // how far away is the camera
+    public Light sightCone; // the light
+    public int rayCount; // defines the "precision" of our collision detection
+
+    private Vector3 initialRotation;
 
     // Use this for initialization
     void Start()
     {
         offset = transform.position - player.transform.position;
-    }
-
-
-    void FixedUpdate()
-    {
-        float moveVertical = Input.GetAxis("Vertical");
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        transform.Rotate(new Vector3(0, moveHorizontal, 0));
+        initialRotation = transform.rotation.eulerAngles;
     }
 
     private void Update()
     {
         transform.position = player.transform.position + offset;
-
         Vector3 velo = (player.GetComponent<Rigidbody>()).velocity;
 
         if (velo != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(velo);
+            transform.Rotate(initialRotation);
         }
 
+        doRayCasts();
     }
 
-    // runs after all items have been processed
-    void LateUpdate()
+    private void doRayCasts()
     {
         Vector3 playerPos = player.transform.position;
-        ArrayList directions = new ArrayList();
 
+        // WARNING: really dumb workaround for now because of the introduced rotation of the light
+        // ... since I already spent 2 hours looking on vector methods
+        // => i know it's stupid, you know it's stupid - let's just keep it that way for now
+        transform.Rotate(-initialRotation);
         Vector3 centerForward = transform.forward;
-        directions.Add(centerForward);
-        Vector3 lower = Quaternion.Euler(0, -45, 0) * centerForward;
-        //directions.Add(lower);
-        Vector3 higher = Quaternion.Euler(0, 45, 0) * centerForward;
-       // directions.Add(higher);
+        transform.Rotate(initialRotation);
 
-        doRayCasts(playerPos, directions);
-    }
+        float lightAngle = sightCone.spotAngle;
+        float lowerY = -lightAngle / 2;
 
-    private void doRayCasts(Vector3 startingPos, ArrayList directions)
-    {
-        foreach(Vector3 direction in directions)
+        float interval = lightAngle / rayCount;
+
+        for (int i = 0; i < rayCount; i++)
         {
-            castSingleRay(startingPos, direction);
+            Vector3 direction = Quaternion.Euler(0, lowerY + interval * i, 0) * centerForward;
+            castSingleRay(playerPos, direction);
         }
     }
 
@@ -75,11 +72,16 @@ public class SightConeController : MonoBehaviour {
             }
             else if (hitObject.tag == "pickup")
             {
-                hitObject.transform.GetChild(0).gameObject.SetActive(true);
+                GameObject childForMinimap = hitObject.transform.GetChild(0).gameObject;
+
+                if (!childForMinimap.activeInHierarchy) {
+                    childForMinimap.SetActive(true);
+                }
             }
         }
 
-        Vector3 forward = direction * sightRange;
-        Debug.DrawRay(startingPos, forward, Color.red);
+        // for debugging, makes ray visible
+        //  Vector3 forward = direction * sightRange;
+        // Debug.DrawRay(startingPos, forward, Color.red);
     }
 }
