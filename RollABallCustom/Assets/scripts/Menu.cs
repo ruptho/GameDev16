@@ -10,7 +10,9 @@ public class Menu : MonoBehaviour {
     public GameObject mainMenuHolder;
     public GameObject optionsMenuHolder;
     public Dictionary<int, PlayerConfiguration> allPlayers = new Dictionary<int, PlayerConfiguration>();
-
+    private int playerCount = 1;
+    private const int MAX_PLAYERS = 4;
+    private float configHeight = 70.0f;
     /**
      * Container class used to represent a player
      * configuration based on the settings menu
@@ -70,6 +72,7 @@ public class Menu : MonoBehaviour {
         // On awake, insert the first (default) player
         PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", InputType.Keyboard);
         allPlayers.Add(1, p1);
+        configHeight = (float)Screen.height / 10.0f;
     }
 
     public void Play()
@@ -111,20 +114,60 @@ public class Menu : MonoBehaviour {
             Dropdown inputSelectionDropdown = settingsCurrPlayer.GetComponentInChildren<Dropdown>();
             allPlayers[playerCounter].setInputType((InputType)inputSelectionDropdown.value);
         }
-        logAllPlayers();
+        LogAllPlayers();
     }
 
+    /**
+     * Add a new player configuration to the options menu. 
+     * 
+     * Instantiates the playerControlSelection prefab and offsets
+     * its position as well as the position of the addPlayer button.
+     */
     public void AddPlayer()
     {
-        // TODO: Add implementation
+        if (playerCount < MAX_PLAYERS)
+        {
+            GameObject newPlayerControl = (GameObject)Instantiate(Resources.Load("playerControlSelection"));
+            Transform newPlayerTransform = newPlayerControl.transform;
+            newPlayerTransform.SetParent(GameObject.Find("OptionsMenu").transform, false);
+            newPlayerTransform.position = new Vector3(newPlayerTransform.position.x, newPlayerTransform.position.y - configHeight * playerCount, newPlayerTransform.position.z);
+            newPlayerControl.name = "PanelControlSelectionP" + ++playerCount;
+
+            Button removeNewPlayerButton = newPlayerControl.GetComponentInChildren<Button>();
+            removeNewPlayerButton.onClick.AddListener(delegate {RemovePlayer(playerCount);});
+
+            Text playerConfigHeadline = newPlayerControl.transform.FindChild("SettingsHeadlineText").GetComponent<Text>();
+            playerConfigHeadline.text = "Settings Player " + playerCount + ":";
+
+            PlayerConfiguration newPlayerConfig = new PlayerConfiguration(playerCount, "Default", InputType.Keyboard);
+            allPlayers.Add(playerCount, newPlayerConfig);
+
+            GameObject addPlayerButton = GameObject.Find("ButtonAddPlayer");
+            addPlayerButton.transform.position = new Vector3(addPlayerButton.transform.position.x, addPlayerButton.transform.position.y - configHeight, addPlayerButton.transform.position.z);
+        }
+        LogAllPlayers();
     }
 
+    /**
+     * Removes an existing player from the options menu.
+     *
+     * The player is also removed from the allPlayers dictionary.
+     * AddPlayer button is positioned correctly afterwards.
+     */
     public void RemovePlayer(int playerID)
     {
-        // TODO: Add implementation
+        if (playerCount > 1)
+        {
+            Destroy(GameObject.Find("PanelControlSelectionP" + playerID));
+            allPlayers.Remove(playerID);
+            playerCount--;
+
+            GameObject addPlayerButton = GameObject.Find("ButtonAddPlayer");
+            addPlayerButton.transform.position = new Vector3(addPlayerButton.transform.position.x, addPlayerButton.transform.position.y + configHeight, addPlayerButton.transform.position.z);
+        }
     }
 
-    public void logAllPlayers()
+    public void LogAllPlayers()
     {
         foreach (KeyValuePair<int, PlayerConfiguration> entry in allPlayers)
         {
