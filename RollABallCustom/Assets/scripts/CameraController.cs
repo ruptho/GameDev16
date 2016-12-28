@@ -2,18 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour
+{
 
+    // variables defined in editor/inspector
     public GameObject player;
+
+    // helper variables 
     private Vector3 offset;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         offset = transform.position - player.transform.position;
-	}
-	
-	// runs after all items have been processed
-	void LateUpdate () {
+    }
+
+    // runs after all items have been processed
+    void LateUpdate()
+    {
         transform.position = player.transform.position + offset;
-	}
+    }
 }

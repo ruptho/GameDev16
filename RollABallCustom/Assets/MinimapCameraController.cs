@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MinimapCameraController : MonoBehaviour {
+public class MinimapCameraController : MonoBehaviour
+{
 
+    // variables defined in editor/inspector
     public GameObject player;
+
+    // helper variables 
     private Vector3 offset;
 
     // Use this for initialization
