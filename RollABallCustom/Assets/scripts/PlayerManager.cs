@@ -13,6 +13,11 @@ public class PlayerManager : MonoBehaviour {
 
         // Create all robbers in Scene
         int numbRobbers = PlayerPrefs.GetInt("NumbRobbers");
+
+        // Disable second Minimap if only one robber
+        if (numbRobbers < 2)
+          GameObject.Find("MinimapLayerRight").SetActive(false);
+
         for (int robberCounter = 0; robberCounter < numbRobbers; robberCounter++)
         {
             GameObject newRobber = (GameObject)Instantiate(Resources.Load("robber"));
