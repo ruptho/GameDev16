@@ -6,73 +6,48 @@ using UnityEngine.UI;
 
 public class Menu : MonoBehaviour {
 
-    public enum InputType { Keyboard, Controller };
-    public GameObject mainMenuHolder;
-    public GameObject optionsMenuHolder;
-    public Dictionary<int, PlayerConfiguration> allPlayers = new Dictionary<int, PlayerConfiguration>();
-    private int playerCount = 1;
+    private enum InputType { Keyboard, Controller };
+    private GameObject mainMenuHolder;
+    private GameObject optionsMenuHolder;
+    private Dictionary<int, PlayerConfiguration> allPlayers = new Dictionary<int, PlayerConfiguration>();
+    private int playerCount = 2;
     private const int MAX_PLAYERS = 4;
     private float configHeight = 70.0f;
     /**
      * Container class used to represent a player
      * configuration based on the settings menu
      */
-    public class PlayerConfiguration
+    private class PlayerConfiguration
     {
-        private int ID = 1;
-        private string playerName = "";
-        private InputType controlType = InputType.Keyboard;
+        public int ID = 1;
+        public string playerName = "";
+        public bool isRobber = false;
+        public InputType inputType = InputType.Keyboard;
 
-        public PlayerConfiguration(int ID, string playerName, InputType controlType)
+        public PlayerConfiguration(int ID, string playerName, bool isRobber, InputType inputType)
         {
             this.ID = ID;
             this.playerName = playerName;
-            this.controlType =controlType;
-        }
-
-
-        public int getID()
-        {
-            return ID;
-        }
-
-        public void setID(int ID)
-        {
-            this.ID = ID;
-        }
-
-        public string getPlayerName()
-        {
-            return playerName;
-        }
-
-        public void setPlayerName(string playerName)
-        {
-            this.playerName = playerName;
-        }
-
-        public InputType getInputType()
-        {
-            return controlType;
-        }
-
-        public void setInputType(InputType controlType)
-        {
-            this.controlType = controlType;
+            this.isRobber = isRobber;
+            this.inputType = inputType;
         }
 
         public string toString()
         {
-            return "Name: " + playerName + "\nInputType: " + controlType;
+            return "Name: " + playerName + "\nInputType: " + inputType;
         }
     }
 
     void Awake()
     {
-        // On awake, insert the first (default) player
-        PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", InputType.Keyboard);
+        // On awake, insert the first two (default) players
+        PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", true, InputType.Keyboard);
         allPlayers.Add(1, p1);
-        configHeight = (float)Screen.height / 10.0f;
+        PlayerConfiguration p2 = new PlayerConfiguration(1, "Default", false, InputType.Keyboard);
+        allPlayers.Add(2, p2);
+
+        configHeight = (float)Screen.height / 10.0f + 25.0f;
+        UpdateSettingsCanvasColors();
     }
 
     public void Play()
@@ -109,10 +84,13 @@ public class Menu : MonoBehaviour {
             GameObject settingsCurrPlayer = GameObject.Find("PanelControlSelectionP" + playerCounter);
 
             InputField playerNameInput = settingsCurrPlayer.GetComponentInChildren<InputField>();
-            allPlayers[playerCounter].setPlayerName(playerNameInput.text);
+            allPlayers[playerCounter].playerName = playerNameInput.text;
 
             Dropdown inputSelectionDropdown = settingsCurrPlayer.GetComponentInChildren<Dropdown>();
-            allPlayers[playerCounter].setInputType((InputType)inputSelectionDropdown.value);
+            allPlayers[playerCounter].inputType = (InputType)inputSelectionDropdown.value;
+
+            Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle>();
+            allPlayers[playerCounter].isRobber = isRobber.isOn;
         }
         LogAllPlayers();
     }
@@ -139,13 +117,15 @@ public class Menu : MonoBehaviour {
             Text playerConfigHeadline = newPlayerControl.transform.FindChild("SettingsHeadlineText").GetComponent<Text>();
             playerConfigHeadline.text = "Settings Player " + playerCount + ":";
 
-            PlayerConfiguration newPlayerConfig = new PlayerConfiguration(playerCount, "Default", InputType.Keyboard);
+            Toggle isRobber = newPlayerControl.GetComponentInChildren<Toggle>();
+            isRobber.onValueChanged.AddListener(delegate { UpdateSettingsCanvasColors(); });
+
+            PlayerConfiguration newPlayerConfig = new PlayerConfiguration(playerCount, "Default", true, InputType.Keyboard);
             allPlayers.Add(playerCount, newPlayerConfig);
 
             GameObject addPlayerButton = GameObject.Find("ButtonAddPlayer");
             addPlayerButton.transform.position = new Vector3(addPlayerButton.transform.position.x, addPlayerButton.transform.position.y - configHeight, addPlayerButton.transform.position.z);
         }
-        LogAllPlayers();
     }
 
     /**
@@ -156,7 +136,7 @@ public class Menu : MonoBehaviour {
      */
     public void RemovePlayer(int playerID)
     {
-        if (playerCount > 1)
+        if (playerCount > 2 && playerID > 2)
         {
             Destroy(GameObject.Find("PanelControlSelectionP" + playerID));
             allPlayers.Remove(playerID);
@@ -164,6 +144,27 @@ public class Menu : MonoBehaviour {
 
             GameObject addPlayerButton = GameObject.Find("ButtonAddPlayer");
             addPlayerButton.transform.position = new Vector3(addPlayerButton.transform.position.x, addPlayerButton.transform.position.y + configHeight, addPlayerButton.transform.position.z);
+        }
+    }
+
+    /**
+     *
+     * Iterates all players and changes the color of the 
+     * settings panel according to the isRobber flag.
+     * 
+     */
+    public void UpdateSettingsCanvasColors()
+    {
+        for (int playerCounter = 1; playerCounter <= allPlayers.Count; playerCounter++)
+        {
+            GameObject settingsCurrPlayer = GameObject.Find("PanelControlSelectionP" + playerCounter);
+            Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle>();
+            Image img = GameObject.Find("PanelControlSelectionP" + playerCounter).GetComponent<Image>();
+
+            if (isRobber.isOn)
+                img.color = new Color(213.0f / 255.0f, 19.0f / 255.0f, 19.0f / 255.0f,100.0f / 255.0f);
+            else
+                img.color = new Color(19.0f / 255.0f, 125.0f / 255.0f, 231.0f / 255.0f, 100.0f / 255.0f);
         }
     }
 
