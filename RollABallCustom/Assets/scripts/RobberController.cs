@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ public class RobberController : MonoBehaviour
     public GameObject robberHead; // the "modeled head of" the player
     public GameObject sightCone; // the "sight cone"/spotlight
     public int objectsToSteal; // how many object the robber has to steal until he wins
-    public GameObject police;  // used to call functions for the police player (e.g. signalLose)
+    public List<Transform> allPoliceMan = new List<Transform>();  // used to call functions for the police player (e.g. signalLose)
 
     // helper variables 
     private Rigidbody rb; // the "real" rigidbody/sphere
@@ -23,15 +24,19 @@ public class RobberController : MonoBehaviour
     private GameObject carriedObject; // the currently carried object
     private float carrySpeed; // the speed of the player while carrying objects
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
-    private PoliceController policeController; // the controller script for the police
+    private List<PoliceController> allPoliceControllers = new List<PoliceController>(); // the controller script for the police
 
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        policeController = police.GetComponent<PoliceController>();
+
+        foreach (Transform policeMan in allPoliceMan)
+            allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
+
         carriedCount = 0;
-        endText.text = "";
+        // Todo: Fix this!
+        //endText.text = "";
         carrySpeed = speed - speedLostPerObject;
     }
 
@@ -99,7 +104,8 @@ public class RobberController : MonoBehaviour
                 if (stolenCount >= objectsToSteal)
                 {
                     signalWin();
-                    policeController.signalLose();
+                    foreach(PoliceController policeController in allPoliceControllers)
+                      policeController.signalLose();
                 }
             }
             else
@@ -131,8 +137,9 @@ public class RobberController : MonoBehaviour
     // this will be called by PoliceController
     public void signalLose()
     {
-        infoText.text = "You got caught by the police!";
-        endText.text = "You lose! :-(";
+        // Todo: Fix this!
+        //infoText.text = "You got caught by the police!";
+        //endText.text = "You lose! :-(";
         transform.gameObject.SetActive(false);
         robberHead.gameObject.SetActive(false);
         sightCone.gameObject.SetActive(false);
@@ -147,5 +154,16 @@ public class RobberController : MonoBehaviour
     {
         infoText.text = "You succesfully stole the required objects!";
         endText.text = "You Win! :-)";
+    }
+
+    public void setPoliceMan(List<GameObject> allPoliceElements)
+    {
+        foreach (GameObject currPoliceElement in allPoliceElements)
+        {
+            Transform policeMan = currPoliceElement.transform.FindChild("Police");
+            allPoliceMan.Add(policeMan);
+        }
+        foreach (Transform policeMan in allPoliceMan)
+            allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
     }
 }

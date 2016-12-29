@@ -6,13 +6,14 @@ using UnityEngine.UI;
 
 public class Menu : MonoBehaviour {
 
-    private enum InputType { Keyboard, Controller };
-    private GameObject mainMenuHolder;
-    private GameObject optionsMenuHolder;
+    public enum InputType { Keyboard, Controller };
+    public GameObject mainMenuHolder;
+    public GameObject optionsMenuHolder;
     private Dictionary<int, PlayerConfiguration> allPlayers = new Dictionary<int, PlayerConfiguration>();
     private int playerCount = 2;
     private const int MAX_PLAYERS = 4;
     private float configHeight = 70.0f;
+
     /**
      * Container class used to represent a player
      * configuration based on the settings menu
@@ -82,7 +83,6 @@ public class Menu : MonoBehaviour {
         for (int playerCounter = 1; playerCounter <= allPlayers.Count; playerCounter++)
         {
             GameObject settingsCurrPlayer = GameObject.Find("PanelControlSelectionP" + playerCounter);
-
             InputField playerNameInput = settingsCurrPlayer.GetComponentInChildren<InputField>();
             allPlayers[playerCounter].playerName = playerNameInput.text;
 
@@ -92,7 +92,8 @@ public class Menu : MonoBehaviour {
             Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle>();
             allPlayers[playerCounter].isRobber = isRobber.isOn;
         }
-        LogAllPlayers();
+
+        savePlayerSettings();
     }
 
     /**
@@ -166,6 +167,30 @@ public class Menu : MonoBehaviour {
             else
                 img.color = new Color(19.0f / 255.0f, 125.0f / 255.0f, 231.0f / 255.0f, 100.0f / 255.0f);
         }
+    }
+
+    /**
+     *
+     * Save all user made settings to the player preferences.
+     * See https://docs.unity3d.com/ScriptReference/PlayerPrefs.html
+     * 
+     */
+    private void savePlayerSettings()
+    {
+        int numbRobbers = 0;
+        int numbCops = 0;
+
+        foreach (KeyValuePair<int, PlayerConfiguration> entry in allPlayers)
+        {
+            if (entry.Value.isRobber)
+                numbRobbers++;
+            else
+                numbCops++;
+        }
+
+        PlayerPrefs.SetInt("NumbRobbers", numbRobbers);
+        PlayerPrefs.SetInt("NumbCops", numbCops);
+        PlayerPrefs.Save();
     }
 
     public void LogAllPlayers()

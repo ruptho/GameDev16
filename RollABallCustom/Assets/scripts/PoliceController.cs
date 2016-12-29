@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PoliceController : MonoBehaviour
 {
@@ -8,18 +9,22 @@ public class PoliceController : MonoBehaviour
     public float speed;
     public Text infoText; // UI element
     public Text endText;  // UI element
-    public GameObject robber; // used to call functions for the robber player (e.g. signalLose)
+    public List<Transform> allRobbers = new List<Transform>(); // used to call functions for the robber player (e.g. signalLose)
 
     // helper variables 
     private Rigidbody rb; // the "real" rigidbody/sphere
-    private RobberController robberController; // the controller script for the robber
+    private List<RobberController> allRobberControllers = new List<RobberController>(); // the controller script for the robber
 
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        robberController = robber.GetComponent<RobberController>();
-        endText.text = "";
+
+        foreach(Transform robber in allRobbers)
+          allRobberControllers.Add(robber.GetComponent<RobberController>());
+
+        // Todo: Fix this!
+        //endText.text = "";
     }
 
     // before any physics calculation - put physics code here
@@ -39,7 +44,9 @@ public class PoliceController : MonoBehaviour
         if (collision.collider.gameObject.CompareTag("robber"))
         {
             signalWin();
-            robberController.signalLose();
+            Debug.Log("RobbrControllers: " + allRobberControllers.Count);
+            foreach(RobberController robberController in allRobberControllers)
+              robberController.signalLose();
         }
     }
 
@@ -52,7 +59,20 @@ public class PoliceController : MonoBehaviour
 
     public void signalWin()
     {
-        infoText.text = "You caught the robber!";
-        endText.text = "You win! :-)";
+        // Todo: Fix this!
+        //infoText.text = "You caught the robber!";
+        //endText.text = "You win! :-)";
+    }
+
+    public void setRobbers(List<GameObject> allRobberElements)
+    {
+        foreach(GameObject currRobberElement in allRobberElements)
+        {
+            Transform robber = currRobberElement.transform.FindChild("Robber");
+            allRobbers.Add(robber);
+        }
+
+        foreach (Transform robber in allRobbers)
+            allRobberControllers.Add(robber.GetComponent<RobberController>());
     }
 }
