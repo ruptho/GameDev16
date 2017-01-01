@@ -6,8 +6,9 @@ public class RobberController : MonoBehaviour
 {
 
     // variables defined in editor/inspector
-    public float speed; // initial speed of the player
-    public float speedLostPerObject; // speed lost if the player carries a object (currently maxed to 1)
+    //public float speed; // initial speed of the player
+	public float initialSpeed;
+	public float strength;
     public Text infoText; // UI element
     public Text stolenObjectsText;  // UI element
     public Text endText;  // UI element
@@ -21,9 +22,9 @@ public class RobberController : MonoBehaviour
     private int carriedCount; // how many objects are carried currently (only 1 possible for now)
     private int stolenCount; // the amount of objects which has been definitely stolen (brought to safe area)
     private GameObject carriedObject; // the currently carried object
-    private float carrySpeed; // the speed of the player while carrying objects
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
     private PoliceController policeController; // the controller script for the police
+	private float currentSpeed;
 
     // Use this for initialization
     void Start()
@@ -32,7 +33,7 @@ public class RobberController : MonoBehaviour
         policeController = police.GetComponent<PoliceController>();
         carriedCount = 0;
         endText.text = "";
-        carrySpeed = speed - speedLostPerObject;
+		currentSpeed = initialSpeed;
     }
 
     // before any physics calculation - put physics code here
@@ -43,7 +44,7 @@ public class RobberController : MonoBehaviour
 
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
         //rb.AddForce(movement * speed); don't accelerate, just set the speed
-        rb.velocity = movement * speed;
+		rb.velocity = movement * initialSpeed;
 
         Vector3 velo = (GetComponent<Rigidbody>()).velocity;
 
@@ -115,7 +116,9 @@ public class RobberController : MonoBehaviour
         go.SetActive(false);
         carriedCount++;
         infoText.text = "You picked up an object!";
-        speed = carrySpeed;
+
+		currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+
     }
 
     private void dropObject(Vector3 offset)
@@ -125,8 +128,23 @@ public class RobberController : MonoBehaviour
         carriedObject.transform.rotation = Quaternion.identity;
         carriedCount--;
         carriedObject = null;
-        speed = carrySpeed + speedLostPerObject; // speed us up again
+		currentSpeed = initialSpeed;
     }
+
+	private float calculateSpeedLoss() 
+	{
+		Rigidbody currentRb = carriedObject.GetComponent<Rigidbody>();
+		float mass = currentRb.mass;
+		float weight = mass * 9.81f; // In Newton
+		float speedLoss = weight / strength;
+
+		if (speedLoss > 1) 
+		{
+			speedLoss = 1;
+		}
+
+		return speedLoss; // Gravity on Earth
+	}
 
     // this will be called by PoliceController
     public void signalLose()
