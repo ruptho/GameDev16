@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class RobberController : MonoBehaviour
 {
@@ -19,9 +20,10 @@ public class RobberController : MonoBehaviour
 
     // helper variables 
     private Rigidbody rb; // the "real" rigidbody/sphere
-    private int carriedCount; // how many objects are carried currently (only 1 possible for now)
+//    private int carriedCount; // how many objects are carried currently (only 1 possible for now)
     private int stolenCount; // the amount of objects which has been definitely stolen (brought to safe area)
-    private GameObject carriedObject; // the currently carried object
+    //private GameObject carriedObject; // the currently carried object
+	private List<GameObject> lootInventory = new List<GameObject>();
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
     private PoliceController policeController; // the controller script for the police
 	private float currentSpeed;
@@ -31,7 +33,7 @@ public class RobberController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         policeController = police.GetComponent<PoliceController>();
-        carriedCount = 0;
+//        carriedCount = 0;
         endText.text = "";
 		currentSpeed = initialSpeed;
     }
@@ -59,7 +61,7 @@ public class RobberController : MonoBehaviour
         // enable object dropping via space
         if (Input.GetKeyUp("space"))
         {
-            if (carriedCount > 0)
+			if (lootInventory.Count > 0)
             {
                 infoText.text = "You dropped an object!";
 
@@ -78,24 +80,18 @@ public class RobberController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("pickup"))
         {
-            // if no object is carried, pickup hit object
-            if (carriedCount == 0)
-            {
-                pickupObject(other.gameObject);
-            }
-            else
-            {
-                infoText.text = "It's too heavy!\n(You can only hold one object!)";
-            }
+			pickupObject(other.gameObject);
         }
         else if (other.gameObject.CompareTag("safeArea"))
         {
-            if (carriedCount > 0)
+			if (lootInventory.Count > 0)
             {
-                carriedObject.tag = "stolenObject";
-                dropObject(lookDirection * 1.5f);
+                //carriedObject.tag = "stolenObject";
+
+				dropLootInventory ();
                 infoText.text = "You succesfully stole an object!";
-                stolenObjectsText.text = "Stolen Objects: " + (++stolenCount);
+                stolenObjectsText.text = "Stolen Objects: " + (stolenCount);
+
 
                 if (stolenCount >= objectsToSteal)
                 {
@@ -112,29 +108,50 @@ public class RobberController : MonoBehaviour
 
     private void pickupObject(GameObject go)
     {
-        carriedObject = go;
+		lootInventory.Add (go);
+//        carriedObject = go;
         go.SetActive(false);
-        carriedCount++;
+//        carriedCount++;
         infoText.text = "You picked up an object!";
 
 		currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
 
     }
 
+	private void dropLootInventory() {
+
+		stolenCount += lootInventory.Count;
+
+		while (lootInventory.Count > 0) 
+		{
+			lootInventory[lootInventory.Count - 1].tag = "stolenObject";
+			dropObject(lookDirection * 1.5f);
+		}
+	}
+
     private void dropObject(Vector3 offset)
     {
-        carriedObject.SetActive(true);
-        carriedObject.transform.position = (transform.position + offset);
-        carriedObject.transform.rotation = Quaternion.identity;
-        carriedCount--;
-        carriedObject = null;
-		currentSpeed = initialSpeed;
+		GameObject droppedObject = lootInventory[lootInventory.Count - 1];
+		lootInventory.RemoveAt (lootInventory.Count - 1);
+		droppedObject.SetActive(true);
+		droppedObject.transform.position = (transform.position + offset);
+		droppedObject.transform.rotation = Quaternion.identity;
+//        carriedCount--;
+//        carriedObject = null;
+		currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
     }
 
 	private float calculateSpeedLoss() 
 	{
-		Rigidbody currentRb = carriedObject.GetComponent<Rigidbody>();
-		float mass = currentRb.mass;
+
+		float mass = 0;
+
+		foreach (GameObject go in lootInventory) 
+		{
+			Rigidbody currentRb = go.GetComponent<Rigidbody>();
+			mass += currentRb.mass;
+		}
+
 		float weight = mass * 9.81f; // In Newton
 		float speedLoss = weight / strength;
 
@@ -143,7 +160,7 @@ public class RobberController : MonoBehaviour
 			speedLoss = 1;
 		}
 
-		return speedLoss; // Gravity on Earth
+		return speedLoss;
 	}
 
     // this will be called by PoliceController
@@ -155,7 +172,7 @@ public class RobberController : MonoBehaviour
         robberHead.gameObject.SetActive(false);
         sightCone.gameObject.SetActive(false);
 
-        if (carriedCount > 0)
+		if (lootInventory.Count > 0)
         {
             dropObject(new Vector3(0, 0, 0)); // drop object at same position
         }
