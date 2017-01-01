@@ -44,7 +44,7 @@ public class RobberController : MonoBehaviour
 
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
         //rb.AddForce(movement * speed); don't accelerate, just set the speed
-		rb.velocity = movement * initialSpeed;
+		rb.velocity = movement * currentSpeed;
 
         Vector3 velo = (GetComponent<Rigidbody>()).velocity;
 
