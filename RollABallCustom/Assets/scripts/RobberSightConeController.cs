@@ -33,17 +33,18 @@ public class RobberSightConeController : MonoBehaviour
     void Update()
     {
         transform.position = player.transform.position + offset;
-        Vector3 velo = (player.GetComponent<Rigidbody>()).velocity;
-
+        Vector3 velo = player.GetComponent<Rigidbody>().velocity;
+        
         if (velo != Vector3.zero)
         {
             lookDirection = velo.normalized;
-            transform.rotation = Quaternion.LookRotation(velo);
         }
+        
 
         // do raycasts to get visible elements
         doRayCasts();
     }
+
 
     void LateUpdate()
     {
@@ -74,9 +75,10 @@ public class RobberSightConeController : MonoBehaviour
         Vector3 playerPos = player.transform.position;
         float lightAngle = sightCone.spotAngle;
         float lowerY = -lightAngle / 2;
+        
 
         float interval = lightAngle / rayCount;
-
+        
         for (int i = 0; i < rayCount; i++)
         {
             Vector3 direction = Quaternion.Euler(0, lowerY + interval * i, 0) * lookDirection;
@@ -92,6 +94,7 @@ public class RobberSightConeController : MonoBehaviour
         // iterate over all hit objects ordered by distance
         foreach (RaycastHit hit in raycastHits)
         {
+            
             GameObject hitObject = hit.transform.gameObject;
 
             if (hitObject.transform.tag == "wall")
@@ -104,6 +107,7 @@ public class RobberSightConeController : MonoBehaviour
                 // these objects will be "discovered" and are NOT moving = ALWAYS visible on minimap
                 if (hitObject.tag == "pickup")
                 {
+                    Debug.Log("Pickup was hit");
                     // first child of pickups is minimap object
                     displayMinimapObject(hitObject.transform.GetChild(0).gameObject);
                 }
@@ -126,8 +130,10 @@ public class RobberSightConeController : MonoBehaviour
     // --------- simple helpers ---------
     private void displayMinimapObject(GameObject minimapObject)
     {
+        Debug.Log("Display MinimapObject1");
         if (!minimapObject.activeInHierarchy)
         {
+            Debug.Log("Display MinimapObject2");
             minimapObject.SetActive(true);
         }
     }

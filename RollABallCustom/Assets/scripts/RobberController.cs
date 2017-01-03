@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public class RobberController : MonoBehaviour
 {
-
-    // variables defined in editor/inspector
+        // variables defined in editor/inspector
     //public float speed; // initial speed of the player
 	public float initialSpeed;
 	public float strength;
@@ -27,10 +26,13 @@ public class RobberController : MonoBehaviour
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
     private PoliceController policeController; // the controller script for the police
 	private float currentSpeed;
+    Animator anim;
+    Vector3 movement;
 
     // Use this for initialization
     void Start()
     {
+        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         policeController = police.GetComponent<PoliceController>();
 //        carriedCount = 0;
@@ -38,12 +40,15 @@ public class RobberController : MonoBehaviour
 		currentSpeed = initialSpeed;
     }
 
+
     // before any physics calculation - put physics code here
     void FixedUpdate()
     {
         float moveVertical = Input.GetAxis("VerticalRobber");
         float moveHorizontal = Input.GetAxis("HorizontalRobber");
 
+        /*
+       
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
         //rb.AddForce(movement * speed); don't accelerate, just set the speed
 		rb.velocity = movement * currentSpeed;
@@ -54,10 +59,62 @@ public class RobberController : MonoBehaviour
         {
             lookDirection = velo.normalized;
         }
+        */
+
+        // Move the player around the scene.
+        Move(moveHorizontal, moveVertical);
+
+        Animating(moveHorizontal,  moveVertical);
+    }
+
+    void Move(float h, float v)
+    {
+        // Set the movement vector based on the axis input.
+        movement.Set(h, 0f, v);
+
+        // Normalise the movement vector and make it proportional to the speed per second.
+        movement = movement.normalized * currentSpeed * Time.deltaTime;
+        rb.velocity = movement;
+        //--rotate in direction of movement
+        // Create a quaternion (rotation) based on looking down the vector from the player to the mouse.
+        if (h != 0f || v != 0f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(movement);
+
+            // Set the player's rotation to this new rotation.
+            rb.MoveRotation(newRotation);
+            lookDirection = movement;
+        }
+        
+
+        // Move the player to it's current position plus the movement.
+        rb.MovePosition(transform.position + movement);
+    }
+
+
+    void Animating(float h, float v)
+    {
+        // Create a boolean that is true if either of the input axes is non-zero.
+        bool walking = h != 0f || v != 0f;
+
+        // Tell the animator whether or not the player is walking.
+        anim.SetBool("IsWalking", walking);
     }
 
     private void Update()
     {
+        if (Input.GetKeyDown("f"))
+        {
+            anim.SetBool("IsCrouching", true);
+            currentSpeed = currentSpeed / 3;
+        }
+        if (Input.GetKeyUp("f"))
+        {
+            anim.SetBool("IsCrouching", false);
+            currentSpeed = currentSpeed * 3;
+        }
+
+
         // enable object dropping via space
         if (Input.GetKeyUp("space"))
         {
@@ -114,7 +171,7 @@ public class RobberController : MonoBehaviour
 //        carriedCount++;
         infoText.text = "You picked up an object!";
 
-		currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+		//currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
 
     }
 
@@ -138,7 +195,7 @@ public class RobberController : MonoBehaviour
 		droppedObject.transform.rotation = Quaternion.identity;
 //        carriedCount--;
 //        carriedObject = null;
-		currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+		//currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
     }
 
 	private float calculateSpeedLoss() 
@@ -169,7 +226,7 @@ public class RobberController : MonoBehaviour
         infoText.text = "You got caught by the police!";
         endText.text = "You lose! :-(";
         transform.gameObject.SetActive(false);
-        robberHead.gameObject.SetActive(false);
+        //robberHead.gameObject.SetActive(false);
         sightCone.gameObject.SetActive(false);
 
 		if (lootInventory.Count > 0)
