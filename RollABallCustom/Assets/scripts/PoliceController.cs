@@ -48,8 +48,7 @@ public class PoliceController : MonoBehaviour
         movement = movement.normalized * speed * Time.deltaTime;
         rb.velocity = movement;
         //--rotate in direction of movement
-        // Create a quaternion (rotation) based on looking down the vector from the player to the mouse.
-        if (h != 0f || v != 0f)
+       if (h != 0f || v != 0f)
         {
             Quaternion newRotation = Quaternion.LookRotation(movement);
 

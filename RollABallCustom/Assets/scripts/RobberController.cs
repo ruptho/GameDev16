@@ -76,7 +76,6 @@ public class RobberController : MonoBehaviour
         movement = movement.normalized * currentSpeed * Time.deltaTime;
         rb.velocity = movement;
         //--rotate in direction of movement
-        // Create a quaternion (rotation) based on looking down the vector from the player to the mouse.
         if (h != 0f || v != 0f)
         {
             Quaternion newRotation = Quaternion.LookRotation(movement);
@@ -103,12 +102,12 @@ public class RobberController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown("f"))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             anim.SetBool("IsCrouching", true);
             currentSpeed = currentSpeed / 3;
         }
-        if (Input.GetKeyUp("f"))
+        if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             anim.SetBool("IsCrouching", false);
             currentSpeed = currentSpeed * 3;
