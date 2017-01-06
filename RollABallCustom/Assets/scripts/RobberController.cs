@@ -1,4 +1,3 @@
-﻿
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +6,9 @@ public class RobberController : MonoBehaviour
 {
 
     // variables defined in editor/inspector
-    public float speed; // initial speed of the player
+    // public float speed; // initial speed of the player
+    public float initialSpeed;
+    public float strength;
     public float speedLostPerObject; // speed lost if the player carries a object (currently maxed to 1)
     public Text infoText; // UI element
     public Text stolenObjectsText;  // UI element
@@ -22,9 +23,10 @@ public class RobberController : MonoBehaviour
     private int carriedCount; // how many objects are carried currently (only 1 possible for now)
     private int stolenCount; // the amount of objects which has been definitely stolen (brought to safe area)
     private GameObject carriedObject; // the currently carried object
-    private float carrySpeed; // the speed of the player while carrying objects
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
     private List<PoliceController> allPoliceControllers = new List<PoliceController>(); // the controller script for the police
+    private List<GameObject> lootInventory = new List<GameObject>();
+    private float currentSpeed;
 
     private KeyCode forwardKey;
     private KeyCode backKey;
@@ -42,11 +44,14 @@ public class RobberController : MonoBehaviour
         foreach (Transform policeMan in allPoliceMan)
             allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
 
-        carriedCount = 0;
+        // carriedCount = 0;
         endText.text = "";
-        carrySpeed = speed - speedLostPerObject;
+
+        // currentSpeed = initialSpeed;
+        currentSpeed = initialSpeed = 10;
+        strength = 50;
     }
-   
+
     // before any physics calculation - put physics code here
     void FixedUpdate()
     {
@@ -56,8 +61,7 @@ public class RobberController : MonoBehaviour
     {
         HandleInputs();
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-
-        rb.velocity = movement * speed;
+        rb.velocity = movement * currentSpeed;
 
         Vector3 velo = (GetComponent<Rigidbody>()).velocity;
 
@@ -69,7 +73,7 @@ public class RobberController : MonoBehaviour
         // enable object dropping via space
         if (Input.GetKeyUp("space"))
         {
-            if (carriedCount > 0)
+            if (lootInventory.Count > 0)
             {
                 infoText.text = "You dropped an object!";
 
@@ -88,30 +92,24 @@ public class RobberController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("pickup"))
         {
-            // if no object is carried, pickup hit object
-            if (carriedCount == 0)
-            {
-                pickupObject(other.gameObject);
-            }
-            else
-            {
-                infoText.text = "It's too heavy!\n(You can only hold one object!)";
-            }
+            pickupObject(other.gameObject);
         }
         else if (other.gameObject.CompareTag("safeArea"))
         {
-            if (carriedCount > 0)
+            if (lootInventory.Count > 0)
             {
-                carriedObject.tag = "stolenObject";
-                dropObject(lookDirection * 1.5f);
+                //carriedObject.tag = "stolenObject";
+
+                dropLootInventory();
                 infoText.text = "You succesfully stole an object!";
-                stolenObjectsText.text = "Stolen Objects: " + (++stolenCount);
+                stolenObjectsText.text = "Stolen Objects: " + (stolenCount);
+
 
                 if (stolenCount >= objectsToSteal)
                 {
                     signalWin();
-                    foreach(PoliceController policeController in allPoliceControllers)
-                      policeController.signalLose();
+                    foreach (PoliceController policeController in allPoliceControllers)
+                        policeController.signalLose();
                 }
             }
             else
@@ -123,21 +121,63 @@ public class RobberController : MonoBehaviour
 
     private void pickupObject(GameObject go)
     {
-        carriedObject = go;
+        lootInventory.Add(go);
+        // carriedObject = go;
         go.SetActive(false);
-        carriedCount++;
+        // carriedCount++;
         infoText.text = "You picked up an object!";
-        speed = carrySpeed;
+
+        currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+
+        Debug.Log("CURR SPEED: " + currentSpeed + " INIT: " + "LOSS: " + (1 - calculateSpeedLoss()));
+    }
+
+    private void dropLootInventory()
+    {
+        stolenCount += lootInventory.Count;
+
+        while (lootInventory.Count > 0)
+        {
+            lootInventory[lootInventory.Count - 1].tag = "stolenObject";
+            dropObject(lookDirection * 1.5f);
+        }
     }
 
     private void dropObject(Vector3 offset)
     {
-        carriedObject.SetActive(true);
-        carriedObject.transform.position = (transform.position + offset);
-        carriedObject.transform.rotation = Quaternion.identity;
-        carriedCount--;
-        carriedObject = null;
-        speed = carrySpeed + speedLostPerObject; // speed us up again
+        GameObject droppedObject = lootInventory[lootInventory.Count - 1];
+        lootInventory.RemoveAt(lootInventory.Count - 1);
+        droppedObject.SetActive(true);
+        droppedObject.transform.position = (transform.position + offset);
+        droppedObject.transform.rotation = Quaternion.identity;
+        //        carriedCount--;
+        //        carriedObject = null;
+        currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+    }
+
+    private float calculateSpeedLoss()
+    {
+
+        float mass = 0;
+
+        foreach (GameObject go in lootInventory)
+        {
+            Rigidbody currentRb = go.GetComponent<Rigidbody>();
+            mass += currentRb.mass;
+        }
+
+        float weight = mass * 9.81f; // In Newton
+
+        Debug.Log("WEIGHT: " + weight + " STRENGTH: " + strength);
+
+        float speedLoss = weight / strength;
+
+        if (speedLoss > 1)
+        {
+            speedLoss = 1;
+        }
+
+        return speedLoss;
     }
 
     // this will be called by PoliceController
