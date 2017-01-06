@@ -47,9 +47,7 @@ public class RobberController : MonoBehaviour
         // carriedCount = 0;
         endText.text = "";
 
-        // currentSpeed = initialSpeed;
-        currentSpeed = initialSpeed = 10;
-        strength = 50;
+        currentSpeed = initialSpeed;
     }
 
     // before any physics calculation - put physics code here
