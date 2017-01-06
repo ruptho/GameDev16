@@ -24,13 +24,21 @@ public class Menu : MonoBehaviour {
         public string playerName = "";
         public bool isRobber = false;
         public InputType inputType = InputType.Keyboard;
+        public KeyCode forward;
+        public KeyCode backward;
+        public KeyCode left;
+        public KeyCode right;
 
-        public PlayerConfiguration(int ID, string playerName, bool isRobber, InputType inputType)
+        public PlayerConfiguration(int ID, string playerName, bool isRobber, InputType inputType, KeyCode forward, KeyCode backward, KeyCode left, KeyCode right)
         {
             this.ID = ID;
             this.playerName = playerName;
             this.isRobber = isRobber;
             this.inputType = inputType;
+            this.forward = forward;
+            this.backward = backward;
+            this.left = left;
+            this.right = right;
         }
 
         public string toString()
@@ -42,12 +50,13 @@ public class Menu : MonoBehaviour {
     void Awake()
     {
         // On awake, insert the first two (default) players
-        PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", true, InputType.Keyboard);
+        PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", true, InputType.Keyboard, KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
         allPlayers.Add(1, p1);
-        PlayerConfiguration p2 = new PlayerConfiguration(1, "Default", false, InputType.Keyboard);
+        PlayerConfiguration p2 = new PlayerConfiguration(1, "Default", false, InputType.Keyboard, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow);
         allPlayers.Add(2, p2);
 
-        configHeight = (float)Screen.height / 10.0f + 25.0f;
+        configHeight = (float)Screen.height / 10.0f + 25;
+        savePlayerSettings();
         UpdateSettingsCanvasColors();
     }
 
@@ -91,9 +100,26 @@ public class Menu : MonoBehaviour {
 
             Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle>();
             allPlayers[playerCounter].isRobber = isRobber.isOn;
-        }
 
-        savePlayerSettings();
+            InputField[] allInputField = settingsCurrPlayer.transform.FindChild("KeyboardSettings").GetComponentsInChildren<InputField>();
+
+            foreach (InputField currInputField in allInputField)
+            {
+                if (currInputField.text.Length != 1)
+                    continue;
+
+                if (currInputField.name.Equals("InputFieldForward"))
+                    allPlayers[playerCounter].forward = (KeyCode)System.Enum.Parse(typeof(KeyCode), currInputField.text.ToUpper());
+                else if (currInputField.name.Equals("InputFieldLeft"))
+                    allPlayers[playerCounter].left = (KeyCode)System.Enum.Parse(typeof(KeyCode), currInputField.text.ToUpper());
+                else if (currInputField.name.Equals("InputFieldBack"))
+                    allPlayers[playerCounter].backward = (KeyCode)System.Enum.Parse(typeof(KeyCode), currInputField.text.ToUpper());
+                else
+                    allPlayers[playerCounter].right = (KeyCode)System.Enum.Parse(typeof(KeyCode), currInputField.text.ToUpper());
+            }
+
+            savePlayerSettings();
+        }
     }
 
     /**
@@ -121,7 +147,7 @@ public class Menu : MonoBehaviour {
             Toggle isRobber = newPlayerControl.GetComponentInChildren<Toggle>();
             isRobber.onValueChanged.AddListener(delegate { UpdateSettingsCanvasColors(); });
 
-            PlayerConfiguration newPlayerConfig = new PlayerConfiguration(playerCount, "Default", true, InputType.Keyboard);
+            PlayerConfiguration newPlayerConfig = new PlayerConfiguration(playerCount, "Default", true, InputType.Keyboard, KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
             allPlayers.Add(playerCount, newPlayerConfig);
 
             GameObject addPlayerButton = GameObject.Find("ButtonAddPlayer");
@@ -182,6 +208,16 @@ public class Menu : MonoBehaviour {
 
         foreach (KeyValuePair<int, PlayerConfiguration> entry in allPlayers)
         {
+            string currID = "R" + numbRobbers;
+
+            if (!entry.Value.isRobber)
+                currID = "C" + numbCops;
+
+            PlayerPrefs.SetString("Forward" + currID, entry.Value.forward.ToString());
+            PlayerPrefs.SetString("Backward" + currID, entry.Value.backward.ToString());
+            PlayerPrefs.SetString("Left" + currID, entry.Value.left.ToString());
+            PlayerPrefs.SetString("Right" + currID, entry.Value.right.ToString());
+
             if (entry.Value.isRobber)
                 numbRobbers++;
             else

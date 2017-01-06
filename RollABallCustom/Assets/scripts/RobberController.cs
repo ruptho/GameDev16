@@ -26,6 +26,14 @@ public class RobberController : MonoBehaviour
     private Vector3 lookDirection;  // where the player is currently looking according to its movement
     private List<PoliceController> allPoliceControllers = new List<PoliceController>(); // the controller script for the police
 
+    private KeyCode forwardKey;
+    private KeyCode backKey;
+    private KeyCode leftKey;
+    private KeyCode rightKey;
+
+    float moveVertical = 0.0f;
+    float moveHorizontal = 0.0f;
+
     // Use this for initialization
     void Start()
     {
@@ -35,19 +43,20 @@ public class RobberController : MonoBehaviour
             allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
 
         carriedCount = 0;
-        // Todo: Fix this!
-        //endText.text = "";
+        endText.text = "";
         carrySpeed = speed - speedLostPerObject;
     }
-
+   
     // before any physics calculation - put physics code here
     void FixedUpdate()
     {
-        float moveVertical = Input.GetAxis("VerticalRobber");
-        float moveHorizontal = Input.GetAxis("HorizontalRobber");
+    }
 
+    private void Update()
+    {
+        HandleInputs();
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        //rb.AddForce(movement * speed); don't accelerate, just set the speed
+
         rb.velocity = movement * speed;
 
         Vector3 velo = (GetComponent<Rigidbody>()).velocity;
@@ -56,10 +65,7 @@ public class RobberController : MonoBehaviour
         {
             lookDirection = velo.normalized;
         }
-    }
 
-    private void Update()
-    {
         // enable object dropping via space
         if (Input.GetKeyUp("space"))
         {
@@ -137,9 +143,8 @@ public class RobberController : MonoBehaviour
     // this will be called by PoliceController
     public void signalLose()
     {
-        // Todo: Fix this!
-        //infoText.text = "You got caught by the police!";
-        //endText.text = "You lose! :-(";
+        infoText.text = "You got caught by the police!";
+        endText.text = "You lose! :-(";
         transform.gameObject.SetActive(false);
         robberHead.gameObject.SetActive(false);
         sightCone.gameObject.SetActive(false);
@@ -156,7 +161,7 @@ public class RobberController : MonoBehaviour
         endText.text = "You Win! :-)";
     }
 
-    public void setPoliceMan(List<GameObject> allPoliceElements)
+    public void SetPoliceMan(List<GameObject> allPoliceElements)
     {
         foreach (GameObject currPoliceElement in allPoliceElements)
         {
@@ -165,5 +170,41 @@ public class RobberController : MonoBehaviour
         }
         foreach (Transform policeMan in allPoliceMan)
             allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
+    }
+
+    public void SetInputs(KeyCode forwardKey, KeyCode backKey, KeyCode leftKey, KeyCode rightKey)
+    {
+        this.forwardKey = forwardKey;
+        this.backKey = backKey;
+        this.leftKey = leftKey;
+        this.rightKey = rightKey;
+    }
+
+    public void HandleInputs()
+    {
+        if (Input.GetKeyUp(forwardKey))
+            moveVertical -= 1.0f;
+
+        if (Input.GetKeyUp(backKey))
+            moveVertical += 1.0f;
+
+        if (Input.GetKeyUp(leftKey))
+            moveHorizontal += 1.0f;
+
+        if (Input.GetKeyUp(rightKey))
+            moveHorizontal -= 1.0f;
+
+
+        if (Input.GetKeyDown(forwardKey))
+            moveVertical += 1.0f;
+
+        if (Input.GetKeyDown(backKey))
+            moveVertical -= 1.0f;
+
+        if (Input.GetKeyDown(leftKey))
+            moveHorizontal -= 1.0f;
+
+        if (Input.GetKeyDown(rightKey))
+            moveHorizontal += 1.0f;
     }
 }
