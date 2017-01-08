@@ -107,7 +107,6 @@ public class RobberSightConeController : MonoBehaviour
                 // these objects will be "discovered" and are NOT moving = ALWAYS visible on minimap
                 if (hitObject.tag == "pickup")
                 {
-                    Debug.Log("Pickup was hit");
                     // first child of pickups is minimap object
                     displayMinimapObject(hitObject.transform.GetChild(0).gameObject);
                 }
@@ -130,10 +129,8 @@ public class RobberSightConeController : MonoBehaviour
     // --------- simple helpers ---------
     private void displayMinimapObject(GameObject minimapObject)
     {
-        Debug.Log("Display MinimapObject1");
         if (!minimapObject.activeInHierarchy)
         {
-            Debug.Log("Display MinimapObject2");
             minimapObject.SetActive(true);
         }
     }
