@@ -74,7 +74,7 @@ public class RobberSightConeController : MonoBehaviour
     {
         Vector3 playerPos = player.transform.position;
         float lightAngle = sightCone.spotAngle;
-        float lowerY = -lightAngle / 2;
+        float lowerY = -lightAngle / 2.0f;
         
 
         float interval = lightAngle / rayCount;

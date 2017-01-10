@@ -200,7 +200,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4000774847625346}
   - component: {fileID: 108329036017804900}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Spotlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -919,7 +919,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4072401117717418}
   - component: {fileID: 108369031654894030}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Spotlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1013,7 +1013,7 @@ GameObject:
   - component: {fileID: 4341304187871922}
   - component: {fileID: 108544125477539128}
   - component: {fileID: 114702052077128742}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SightCone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2779,7 +2779,7 @@ Light:
   m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294966271
+    m_Bits: 4294966015
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
@@ -2813,7 +2813,7 @@ Light:
   m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294966271
+    m_Bits: 4294966015
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
@@ -2847,7 +2847,7 @@ Light:
   m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294966271
+    m_Bits: 4294966015
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0

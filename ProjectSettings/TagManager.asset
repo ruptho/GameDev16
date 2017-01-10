@@ -24,8 +24,8 @@ TagManager:
   - Minimap
   - Robber
   - Police
-  - 
-  - 
+  - RobberSightCone
+  - PoliceSightCone
   - 
   - 
   - 
