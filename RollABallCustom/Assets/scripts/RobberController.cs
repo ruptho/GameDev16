@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class RobberController : MonoBehaviour
 {
-
-    // variables defined in editor/inspector
+        // variables defined in editor/inspector
     // public float speed; // initial speed of the player
     public float initialSpeed;
     public float strength;
@@ -35,10 +34,13 @@ public class RobberController : MonoBehaviour
 
     float moveVertical = 0.0f;
     float moveHorizontal = 0.0f;
+	Animator anim;
+	Vector3 movement;
 
     // Use this for initialization
     void Start()
     {
+        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
 
         foreach (Transform policeMan in allPoliceMan)
@@ -50,24 +52,22 @@ public class RobberController : MonoBehaviour
         currentSpeed = initialSpeed;
     }
 
+
     // before any physics calculation - put physics code here
     void FixedUpdate()
     {
+        // Move the player around the scene.
+        Move(moveHorizontal, moveVertical);
+
+        Animating(moveHorizontal, moveVertical);
     }
 
+        
+       
     private void Update()
     {
         HandleInputs();
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        rb.velocity = movement * currentSpeed;
-
-        Vector3 velo = (GetComponent<Rigidbody>()).velocity;
-
-        if (velo != Vector3.zero)
-        {
-            lookDirection = velo.normalized;
-        }
-
+        
         // enable object dropping via space
         if (Input.GetKeyUp("space"))
         {
@@ -83,6 +83,51 @@ public class RobberController : MonoBehaviour
                 infoText.text = "You can't drop something you don't carry!";
             }
         }
+
+    if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            anim.SetBool("IsCrouching", true);
+            currentSpeed = currentSpeed / 3;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            anim.SetBool("IsCrouching", false);
+            currentSpeed = currentSpeed * 3;
+        }
+    }
+
+
+    void Move(float h, float v)
+    {
+        // Set the movement vector based on the axis input.
+        movement.Set(h, 0f, v);
+
+        // Normalise the movement vector and make it proportional to the speed per second.
+        movement = movement.normalized * currentSpeed * Time.deltaTime;
+        rb.velocity = movement;
+        //--rotate in direction of movement
+        if (h != 0f || v != 0f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(movement);
+
+            // Set the player's rotation to this new rotation.
+            rb.MoveRotation(newRotation);
+            lookDirection = movement;
+        }
+        
+
+        // Move the player to it's current position plus the movement.
+        rb.MovePosition(transform.position + movement);
+        Debug.Log("ROBBER Position: " + transform.position);
+    }
+
+ void Animating(float h, float v)
+    {
+        // Create a boolean that is true if either of the input axes is non-zero.
+        bool walking = h != 0f || v != 0f;
+
+        // Tell the animator whether or not the player is walking.
+        anim.SetBool("IsWalking", walking);
     }
 
     // triggers entering
@@ -125,9 +170,8 @@ public class RobberController : MonoBehaviour
         // carriedCount++;
         infoText.text = "You picked up an object!";
 
-        currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+        //currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
 
-        Debug.Log("CURR SPEED: " + currentSpeed + " INIT: " + "LOSS: " + (1 - calculateSpeedLoss()));
     }
 
     private void dropLootInventory()
@@ -184,7 +228,7 @@ public class RobberController : MonoBehaviour
         infoText.text = "You got caught by the police!";
         endText.text = "You lose! :-(";
         transform.gameObject.SetActive(false);
-        robberHead.gameObject.SetActive(false);
+        //robberHead.gameObject.SetActive(false);
         sightCone.gameObject.SetActive(false);
 
         if (carriedCount > 0)
@@ -203,11 +247,14 @@ public class RobberController : MonoBehaviour
     {
         foreach (GameObject currPoliceElement in allPoliceElements)
         {
-            Transform policeMan = currPoliceElement.transform.FindChild("Police");
+            Transform policeMan = currPoliceElement.transform.FindChild("Police_nic");
             allPoliceMan.Add(policeMan);
         }
         foreach (Transform policeMan in allPoliceMan)
+        {
             allPoliceControllers.Add(policeMan.GetComponent<PoliceController>());
+        }
+            
     }
 
     public void SetInputs(KeyCode forwardKey, KeyCode backKey, KeyCode leftKey, KeyCode rightKey)

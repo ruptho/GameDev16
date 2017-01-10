@@ -44,7 +44,7 @@ public class PoliceSightConeController : MonoBehaviour
         if (velo != Vector3.zero)
         {
             lookDirection = velo.normalized;
-            transform.rotation = Quaternion.LookRotation(velo);
+            //transform.rotation = Quaternion.LookRotation(velo);
         }
 
         // TODO: for this to REALLY work, use own minimap

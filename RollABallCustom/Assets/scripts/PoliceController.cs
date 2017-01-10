@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
@@ -24,11 +23,14 @@ public class PoliceController : MonoBehaviour
     private List<RobberController> allRobberControllers = new List<RobberController>(); // the controller script for the robber
 
 
+    Animator anim;
+    Vector3 movement;
 
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        anim = GetComponent<Animator>();
 
         foreach(Transform robber in allRobbers)
           allRobberControllers.Add(robber.GetComponent<RobberController>());
@@ -36,18 +38,54 @@ public class PoliceController : MonoBehaviour
         endText.text = "";
     }
 
-    void Update()
-    {
-        HandleInputs();
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        //rb.AddForce(movement * speed);
-        rb.velocity = movement * speed;
-    }
-
     // before any physics calculation - put physics code here
     void FixedUpdate()
     {
+        // Move the player around the scene.
+        Move(moveHorizontal, moveVertical);
+
+        Animating(moveHorizontal, moveVertical);
     }
+
+    void Update()
+    {
+        HandleInputs();
+      
+
+    }
+
+    void Move(float h, float v)
+    {
+        // Set the movement vector based on the axis input.
+        movement.Set(h, 0f, v);
+
+        // Normalise the movement vector and make it proportional to the speed per second.
+        movement = movement.normalized * speed * Time.deltaTime;
+        rb.velocity = movement;
+        //--rotate in direction of movement
+       if (h != 0f || v != 0f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(movement);
+
+            // Set the player's rotation to this new rotation.
+            rb.MoveRotation(newRotation);
+        }
+
+
+        // Move the player to it's current position plus the movement.
+        rb.MovePosition(transform.position + movement);
+        Debug.Log("POLICEPOSITION: " + transform.position);
+    }
+
+    void Animating(float h, float v)
+    {
+        // Create a boolean that is true if either of the input axes is non-zero.
+        bool walking = h != 0f || v != 0f;
+        // Tell the animator whether or not the player is walking.
+        anim.SetBool("IsWalking", walking);
+    }
+
+
 
     // collision detection with rigid bodies
     void OnCollisionEnter(Collision collision)
@@ -78,7 +116,7 @@ public class PoliceController : MonoBehaviour
     {
         foreach(GameObject currRobberElement in allRobberElements)
         {
-            Transform robber = currRobberElement.transform.FindChild("Robber");
+            Transform robber = currRobberElement.transform.FindChild("Robber_nic");
             allRobbers.Add(robber);
         }
 

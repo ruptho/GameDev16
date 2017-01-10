@@ -59,7 +59,8 @@ public class PlayerManager : MonoBehaviour
         // Assign each robber to all policeman
         for (int robberCounter = 0; robberCounter < allRobbers.Count; robberCounter++)
         {
-            Transform robber = allRobbers[robberCounter].transform.FindChild("Robber");
+            Transform robber = allRobbers[robberCounter].transform.FindChild("Robber_nic");
+            Debug.Log(robber);
             RobberController currRobberController = robber.GetComponent<RobberController>();
 
             KeyCode forwardKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("ForwardR" + robberCounter));
@@ -71,13 +72,15 @@ public class PlayerManager : MonoBehaviour
             currRobberController.endText = GameObject.Find("RobberText" + robberCounter).transform.FindChild("RobberEndText").GetComponent<Text>();
             currRobberController.stolenObjectsText = GameObject.Find("RobberText" + robberCounter).transform.FindChild("RobbedObjectCountText").GetComponent<Text>();
             currRobberController.SetInputs(forwardKey, backKey, leftKey, rightKey);
+            Debug.Log("allPoliceman: " + allPoliceMan);
             currRobberController.SetPoliceMan(allPoliceMan);
         }
 
         // Assign each policeman to all robbers
         for (int policeCounter = 0; policeCounter < allPoliceMan.Count; policeCounter++)
         {
-            Transform policeMan = allPoliceMan[policeCounter].transform.FindChild("Police");
+            Transform policeMan = allPoliceMan[policeCounter].transform.FindChild("Police_nic");
+            Debug.Log("policeMan: " + policeMan);
             PoliceController currPoliceController = policeMan.GetComponent<PoliceController>();
 
             KeyCode forwardKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("ForwardC" + policeCounter));

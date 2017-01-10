@@ -17,9 +17,13 @@ public class CameraController : MonoBehaviour
         offset = transform.position - player.transform.position;
     }
 
+
     // runs after all items have been processed
     void LateUpdate()
     {
+        Debug.Log("player: " + player);
+        Debug.Log("offset: " + offset);
         transform.position = player.transform.position + offset;
+        Debug.Log("player position: " + player.transform.position);
     }
 }
