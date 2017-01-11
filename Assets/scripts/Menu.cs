@@ -56,7 +56,7 @@ public class Menu : MonoBehaviour {
         allPlayers.Add(2, p2);
 
         configHeight = (float)Screen.height / 10.0f + 25;
-        savePlayerSettings();
+        SavePlayerSettings();
         UpdateSettingsCanvasColors();
     }
 
@@ -81,6 +81,7 @@ public class Menu : MonoBehaviour {
 
     public void MainMenu()
     {
+        ApplyChanges();
         mainMenuHolder.SetActive(true);
         optionsMenuHolder.SetActive(false);
     }
@@ -118,7 +119,7 @@ public class Menu : MonoBehaviour {
                     allPlayers[playerCounter].right = (KeyCode)System.Enum.Parse(typeof(KeyCode), currInputField.text.ToUpper());
             }
 
-            savePlayerSettings();
+            SavePlayerSettings();
         }
     }
 
@@ -201,7 +202,7 @@ public class Menu : MonoBehaviour {
      * See https://docs.unity3d.com/ScriptReference/PlayerPrefs.html
      * 
      */
-    private void savePlayerSettings()
+    private void SavePlayerSettings()
     {
         int numbRobbers = 0;
         int numbCops = 0;
