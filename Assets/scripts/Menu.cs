@@ -11,7 +11,7 @@ public class Menu : MonoBehaviour {
     public GameObject optionsMenuHolder;
     private Dictionary<int, PlayerConfiguration> allPlayers = new Dictionary<int, PlayerConfiguration>();
     private int playerCount = 2;
-    private const int MAX_PLAYERS = 4;
+    private const int MAX_PLAYERS = 2; //TODO: set max players
     private float configHeight = 70.0f;
 
     /**
@@ -49,6 +49,9 @@ public class Menu : MonoBehaviour {
 
     void Awake()
     {
+		//always show main menu when awakening
+		MainMenu ();
+
         // On awake, insert the first two (default) players
         PlayerConfiguration p1 = new PlayerConfiguration(1, "Default", true, InputType.Keyboard, KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
         allPlayers.Add(1, p1);
