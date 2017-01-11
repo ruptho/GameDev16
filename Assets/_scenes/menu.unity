@@ -5039,6 +5039,11 @@ Prefab:
       propertyPath: m_Text
       value: Add Player
       objectReference: {fileID: 0}
+    - target: {fileID: 114694327324838850, guid: a28d77b6be86e4d20aec996742d22473,
+        type: 2}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a28d77b6be86e4d20aec996742d22473, type: 2}
   m_IsPrefabParent: 0
