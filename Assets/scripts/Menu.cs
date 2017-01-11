@@ -189,13 +189,15 @@ public class Menu : MonoBehaviour {
         for (int playerCounter = 1; playerCounter <= allPlayers.Count; playerCounter++)
         {
             GameObject settingsCurrPlayer = GameObject.Find("PanelControlSelectionP" + playerCounter);
-            Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle>();
-            Image img = GameObject.Find("PanelControlSelectionP" + playerCounter).GetComponent<Image>();
+			if (settingsCurrPlayer != null) { //FIXME: remove null
+				Toggle isRobber = settingsCurrPlayer.GetComponentInChildren<Toggle> ();
+				Image img = GameObject.Find ("PanelControlSelectionP" + playerCounter).GetComponent<Image> ();
 
-            if (isRobber.isOn)
-                img.color = new Color(213.0f / 255.0f, 19.0f / 255.0f, 19.0f / 255.0f,100.0f / 255.0f);
-            else
-                img.color = new Color(19.0f / 255.0f, 125.0f / 255.0f, 231.0f / 255.0f, 100.0f / 255.0f);
+				if (isRobber.isOn)
+					img.color = new Color (213.0f / 255.0f, 19.0f / 255.0f, 19.0f / 255.0f, 100.0f / 255.0f);
+				else
+					img.color = new Color (19.0f / 255.0f, 125.0f / 255.0f, 231.0f / 255.0f, 100.0f / 255.0f);
+			}
         }
     }
 
