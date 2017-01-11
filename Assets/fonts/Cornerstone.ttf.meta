@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: bb8de4c4da96047a7b901488baa4bea3
+timeCreated: 1484132722
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Cornerstone
+  fontNames:
+  - Cornerstone
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
