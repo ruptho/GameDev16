@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b0ced95decb3c426d9a8d2899e6c1831
-timeCreated: 1484139707
+timeCreated: 1484268840
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -8,6 +8,7 @@ TextureImporter:
     21300002: button_hover
     21300004: button_click
     21300006: button_disabled
+    21300008: input
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -123,6 +124,19 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 32, y: 32, z: 32, w: 32}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: input
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 96
+        width: 96
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 14, y: 14, z: 14, w: 14}
       outline: []
       tessellationDetail: 0
     outline: []
