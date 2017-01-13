@@ -170,7 +170,7 @@ public class RobberController : MonoBehaviour
         // carriedCount++;
         infoText.text = "You picked up an object!";
 
-        //currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
+        currentSpeed = initialSpeed * (1 - calculateSpeedLoss());
 
     }
 
@@ -190,7 +190,7 @@ public class RobberController : MonoBehaviour
         GameObject droppedObject = lootInventory[lootInventory.Count - 1];
         lootInventory.RemoveAt(lootInventory.Count - 1);
         droppedObject.SetActive(true);
-        droppedObject.transform.position = (transform.position + offset);
+        droppedObject.transform.position = (transform.position + offset*15);
         droppedObject.transform.rotation = Quaternion.identity;
         //        carriedCount--;
         //        carriedObject = null;
