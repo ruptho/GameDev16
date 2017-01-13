@@ -3136,8 +3136,8 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1.22
   m_Text: "Handcrafted by\n\tLukas Gregori\t\tLukas Plechinger\n\tKlemens Strasser\tThorsten
-    Ruprechter\n\tNicole Weidinger\n\nMusic (Royality free Music):\n\tMenu: \tThe
-    Hero Steps Up - Dougie Wood\n\tGame:\tWitchy Britches - RW Smitch"
+    Ruprechter\n\tNicole Weidinger\n\nMusic (Royalty free Music)\n\tMenu: \tThe Hero
+    Steps Up - Dougie Wood\n\tGame:\tWitchy Britches - RW Smitch"
 --- !u!222 &1473483864
 CanvasRenderer:
   m_ObjectHideFlags: 0
