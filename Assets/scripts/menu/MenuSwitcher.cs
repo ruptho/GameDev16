@@ -7,6 +7,9 @@ public class MenuSwitcher : MonoBehaviour {
 	public GameObject mainMenu;
 	public GameObject optionsMenu;
 	public GameObject serverMenu;
+	public GameObject lobbyMenu;
+	public GameObject creditsMenu;
+	public GameObject joinGameMenu;
 
 
 	void Start()
@@ -21,6 +24,9 @@ public class MenuSwitcher : MonoBehaviour {
 		mainMenu.SetActive (false);
 		optionsMenu.SetActive (false);
 		serverMenu.SetActive (false);
+		lobbyMenu.SetActive (false);
+		creditsMenu.SetActive (false);
+		joinGameMenu.SetActive (false);
 	}
 
 	public void ShowMainMenu(){
@@ -36,5 +42,20 @@ public class MenuSwitcher : MonoBehaviour {
 	public void ShowServerMenu(){
 		HideAll ();
 		serverMenu.SetActive (true);
+	}
+
+	public void ShowLobbyMenu(){
+		HideAll ();
+		lobbyMenu.SetActive (true);
+	}
+
+	public void ShowCreditsMenu(){
+		HideAll ();
+		creditsMenu.SetActive (true);
+	}
+
+	public void ShowJoinGameMenu(){
+		HideAll ();
+		joinGameMenu.SetActive (true);
 	}
 }

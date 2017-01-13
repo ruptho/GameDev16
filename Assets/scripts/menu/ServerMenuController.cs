@@ -98,7 +98,7 @@ public class ServerMenuController : MonoBehaviour {
 
 
 
-	public void OnJoin(){
+	public void OnStartPrototype(){
 		SetupGameLegacy (); //remove when implementing "real" networking
 
 		SceneManager.LoadScene("minigame");
