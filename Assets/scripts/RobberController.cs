@@ -76,7 +76,7 @@ public class RobberController : MonoBehaviour
                 infoText.text = "You dropped an object!";
 
                 // drop objet a bit behind robber
-                dropObject(lookDirection * -1.5f);
+				dropObject(lookDirection * -2.0f);
             }
             else
             {
@@ -112,7 +112,7 @@ public class RobberController : MonoBehaviour
 
             // Set the player's rotation to this new rotation.
             rb.MoveRotation(newRotation);
-            lookDirection = movement;
+			lookDirection = movement.normalized;
         }
         
 
@@ -190,7 +190,7 @@ public class RobberController : MonoBehaviour
         GameObject droppedObject = lootInventory[lootInventory.Count - 1];
         lootInventory.RemoveAt(lootInventory.Count - 1);
         droppedObject.SetActive(true);
-        droppedObject.transform.position = (transform.position + offset*15);
+        droppedObject.transform.position = (transform.position + offset);
         droppedObject.transform.rotation = Quaternion.identity;
         //        carriedCount--;
         //        carriedObject = null;
