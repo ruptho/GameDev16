@@ -10,6 +10,11 @@ public class OptionsMenuController : MonoBehaviour {
 	public const string KEY_PLAYER_ALIAS = "options.playerAlias";
 
 	void Start () {
+		LoadPrefs ();
+	}
+
+
+	void LoadPrefs(){
 		if (PlayerPrefs.HasKey (KEY_PLAYER_ALIAS)) {
 			playerAliasInput.text = PlayerPrefs.GetString (KEY_PLAYER_ALIAS);
 		}
@@ -21,5 +26,9 @@ public class OptionsMenuController : MonoBehaviour {
 		if (alias.Length > 0) {
 			PlayerPrefs.SetString (KEY_PLAYER_ALIAS, alias);
 		}
+	}
+
+	public void OnCancel(){
+		LoadPrefs (); //restore preferences
 	}
 }

@@ -39,6 +39,9 @@ public class ValidatePlayerName : MonoBehaviour {
 		inputField.onValidateInput += delegate(string input, int charIndex, char addedChar) { return ValidateAlias( input, addedChar ); };
 		inputField.onValueChange.AddListener (delegate {OnChange ();});
 		successButton.interactable = false;
+
+		//fire OnChange for already set text.
+		OnChange ();
 	}
 
 	private char ValidateAlias(string input, char added){
